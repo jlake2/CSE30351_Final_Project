@@ -1,6 +1,6 @@
-#John F. Lake, Jr.
-#CSE30151 Project 2
-#This program will take in a text file that describes a DPDA. 
+#John F. Lake, Jr. & Kyle Kozak
+#CSE30151 Project 3
+#Turing Machine
 import sys
 import re
 
