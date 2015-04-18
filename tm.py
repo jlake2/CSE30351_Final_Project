@@ -164,10 +164,16 @@ def processInput(tm):
 
 		#Set the current state to whatever the start state is: 
 		currentState = tm['start'][0]
+		numSteps = 0
 
 		#for each input character (item), interpret its effect:
 		while not done:
 			reject = 1
+			numSteps = numSteps + 1
+			if numSteps == 1000:
+				print "DID NOT HALT"
+				done = 1
+				break
 
 			if currentState == tm['endStates'][0]:
 				printState(tape,pos,currentState)
