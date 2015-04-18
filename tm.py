@@ -1,6 +1,7 @@
 #John F. Lake, Jr. & Kyle Kozak
 #CSE30151 Project 3
-#Turing Machine
+#Program that models a Turing Machine
+
 import sys
 import re
 
@@ -51,6 +52,9 @@ def getTM(filename):
 			# t[4] is the direction to go
 			t = []
 			t = re.split(',|\n', line[2:-1])
+			for key,value in trans.iteritems():
+				if value[0] == t[0] and value[1] == t[1]:
+					return -3
 			if len(t) == 1 and t[0] == "":
 				return -1
 			elif t[0] not in n['states'] or t[2] not in n['states']:
@@ -104,15 +108,6 @@ def printState(tape,pos,currentState):
 			else:
 				sys.stdout.write("%s," % tape[i])
 		print ")"
-	elif pos is len(tape):
-		sys.stdout.write('(')
-		for i in range(0,pos):
-			if i is pos-1:
-				sys.stdout.write("%s" % tape[i])
-			else:
-				sys.stdout.write("%s," % tape[i])
-		sys.stdout.write(')')
-		sys.stdout.write("%s()" % currentState)
 	else: 
 		sys.stdout.write('(')
 		for i in range(0,pos):
@@ -131,9 +126,63 @@ def printState(tape,pos,currentState):
 		print ")"
 
 
-def processInput(tm):
 
-	
+#Tells if the tape input is valid given the alphabet
+def inalpha(tm,tape):
+	for input in tape:
+		if input not in tm['alphabet']:
+			print "REJECT: Input not in input alphabet!"
+			return 0
+	return 1
+
+
+#Check if the machine is accepting or rejecting: 
+def checkIfOver(i,cs,tm,tape,pos,num):
+	if cs == tm['endStates'][0]:
+		printState(tape,pos,cs)
+		print "ACCEPT",
+		if i is not num-1:
+			print "\n"
+		return 1
+	elif cs == tm['endStates'][1]:
+		printState(tape,pos,cs)
+		print "REJECT",
+		if i is not num-1:
+			print "\n"
+		return 1
+	return 0
+
+
+def checkTrans(tm,currentState,tape,pos):
+	reject = 1
+	for key,value in tm['transitions'].iteritems():
+		#If the currentState matches the state from a transition AND the input matches
+		if currentState == value[0] and tape[pos] == value[1]:
+
+			reject = 0
+			printState(tape,pos,currentState) #print the state
+			currentState = value[2]	#Next state
+			output = value[3]#Output	
+			dir = value[4]	#direction to go
+
+			#If you're moving right on the tape: 
+			if dir is "R":
+				tape[pos] = output
+				pos = pos + 1
+				if pos is len(tape):
+					tape.append(' ')
+
+			#If you're moving left: 
+			elif dir is "L":
+				tape[pos] = output
+				pos = pos - 1
+
+	return reject,currentState,tm,tape,pos
+
+
+
+#This is the big function that handles the input tapes
+def processInput(tm):
 	
 	#Get the number of input tapes, with error checking
  	numInputTapes = raw_input("")
@@ -145,22 +194,17 @@ def processInput(tm):
 		if numInputTapes == 0:
 			print "Number of inputs needs to be a positive number."
 			return
-			
 
 	#Get each input tape and delimit it. 
 	for i in range(numInputTapes):
 		pos = 0
 		done = 0
-
-		#Get the input: 
 		it = raw_input("")
 
-		#The tape is infinite in one direction (to the right)
+		#Check and make sure the input is in the alphabet:
 		tape = re.split(',',it)
-		for input in tape:
-			if input not in tm['alphabet']:
-				print "REJECT: Input not in input alphabet!"
-				return
+		if not inalpha(tm,tape):
+			continue
 
 		#Set the current state to whatever the start state is: 
 		currentState = tm['start'][0]
@@ -175,64 +219,37 @@ def processInput(tm):
 				done = 1
 				break
 
-			if currentState == tm['endStates'][0]:
-				printState(tape,pos,currentState)
-				print "ACCEPT",
-				if i is not numInputTapes-1:
-					print "\n"
-				done = 1
+			#Check if it's accepted or not
+			done = checkIfOver(i,currentState,tm,tape,pos,numInputTapes)
+			if done: 
 				break
-			elif currentState == tm['endStates'][1]:
-				printState(tape,pos,currentState)
-				print "REJECT",
-				if i is not numInputTapes-1:
-					print "\n"
-				done = 1
-				break
+			
+			#run through the transitions and find the rule that governs the state we are in:
+			reject,currentState,tm,tape,pos = checkTrans(tm,currentState,tape,pos)
 
-
-			#run through the transitinos and find the rule that governs the state we are in:
-			for key,value in tm['transitions'].iteritems():
-
-				#If the currentState matches the state from a transition AND the input matches
-				if currentState == value[0] and tape[pos] == value[1]:
-
-					reject = 0 				#There is a valid transition, don't reject yet
-					printState(tape,pos,currentState) 	#Print the current state of the machine
-					currentState = value[2]			#set the next state we are going to
-					output = value[3]			#symbol to be written
-					dir = value[4]				#tape head direction
-		
-					#If you're moving right on the tape: 
-					if dir is "R":
-						tape[pos] = output
-						pos = pos + 1
-						if pos is len(tape):
-							tape.append(' ')
-
-					#If you're moving left: 
-					elif dir is "L":
-						tape[pos] = output
-						pos = pos - 1
-
+			#if there is no transition, move to the reject state
 			if reject:
-				printState(tape,pos,currentState) 	#Print the current state of the machine
+				printState(tape,pos,currentState) 	
 				pos = pos + 1
 				if pos is len(tape):
 					tape.append(' ')
 				currentState = tm['endStates'][1]
 
-					
-
 def main(argv):
-	
 	#The Turing Machine is described by a dictionary
 	tm = {}
-	tm = getTM(argv[1])	
+	if len(argv) == 2:
+		tm = getTM(argv[1])	
+	else:
+		print "ERROR, USAGE: python tm.py TMFILE"	
+		sys.exit(0)
 
 
+	#Error checking
 	if(tm == -1):
 		print "ERROR, INVALID TM INPUT!"
+	elif tm == -3:
+		print "ERROR, TM INPUT IS NOT DETERMINISTIC!"
 	else:
 		if(tm != 0):
 			#There is a valid NFA: 
