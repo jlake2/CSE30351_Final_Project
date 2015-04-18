@@ -3,7 +3,6 @@
 #Turing Machine
 import sys
 import re
-#testing desktop github
 
 
 #This will get all 6 Parts of the DPDA:
@@ -110,24 +109,31 @@ def processInput(tm):
 
 		#Set the css to whatever the start state is: 
 		cs = tm['start'][0]
-
-
-
-						
-				
-				
-	
+		print
+		print cs
+		#for each input character (item), interpret its effect:
+		for item in inputTape:
+			#run through the transitinos and find the rule that governs the state we are in:
+			for tran in tm['transitions']:
+				if cs == tm['transitions'][tran][0]:
+					#if the state matched, we do this:
+					ts = tm['transitions'][tran][1]#set the current tape symbol
+					ns = tm['transitions'][tran][2]#set the next state we are going to
+					ns = tm['transitions'][tran][3]#symbol to be written
+					td = tm['transitions'][tran][4]#tape head direction
 
 def main(argv):
 	#DPDA is a dictionary. Set it up:
 	tm = {}
 	tm = getTM(argv[1])	
+
 	for key,value in tm.iteritems():
 		print tm[key]
 
 
 
 	if(tm == -1):
+		print "ERROR, INVALID TM INPUT!"
 	else:
 		if(tm != 0):
 			#There is a valid NFA: 
