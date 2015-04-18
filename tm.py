@@ -93,6 +93,7 @@ def getTM(filename):
 
 
 
+#Function to write down the current state of the Turing machine
 def printState(tape,pos,currentState):
 	if pos is 0:
 		sys.stdout.write('()')
@@ -119,9 +120,22 @@ def printState(tape,pos,currentState):
 				sys.stdout.write("%s," % tape[i])
 		print ")"
 
+
 def processInput(tm):
 
- 	numInputTapes = int(raw_input(""))
+	
+	
+	#Get the number of input tapes, with error checking
+ 	numInputTapes = raw_input("")
+	if not numInputTapes.isdigit():
+		print "Number of inputs needs to be a positive number."
+		return
+	else:
+		numInputTapes = int(numInputTapes)
+		if numInputTapes == 0:
+			print "Number of inputs needs to be a positive number."
+			return
+			
 
 	#Get each input tape and delimit it. 
 	for i in range(numInputTapes):
@@ -133,9 +147,10 @@ def processInput(tm):
 
 		#The tape is infinite in one direction (to the right)
 		tape = re.split(',',it)
-
-		#Used to make sure the input is valid: 
-		validInput=1;
+		for input in tape:
+			if input not in tm['alphabet']:
+				print "REJECT: Input not in input alphabet!"
+				return
 
 		#Set the current state to whatever the start state is: 
 		currentState = tm['start'][0]
