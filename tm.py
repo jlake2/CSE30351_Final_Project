@@ -98,7 +98,6 @@ def processInput(tm):
  	numInputTapes = int(raw_input(""))
 
 	#Get each input tape and delimit it. 
-
 	for i in range(numInputTapes):
 
 		#Get the input: 
@@ -129,7 +128,6 @@ def main(argv):
 
 
 	if(tm == -1):
-		print "ERROR, INVALID DPDA INPUT!"
 	else:
 		if(tm != 0):
 			#There is a valid NFA: 
