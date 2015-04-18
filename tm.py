@@ -78,7 +78,7 @@ def getTM(filename):
 		elif(line[0] == 'F'):
 			#Obtain the end states:
 			f = []
-			f = re.split(',|\n', line[2:-1])
+			f = re.split(',|\n', line[2:7])
 			if len(f) == 1 and f[0] == "":
 				return -1
 			elif len(f) is not 2:
@@ -104,6 +104,15 @@ def printState(tape,pos,currentState):
 			else:
 				sys.stdout.write("%s," % tape[i])
 		print ")"
+	elif pos is len(tape):
+		sys.stdout.write('(')
+		for i in range(0,pos):
+			if i is pos-1:
+				sys.stdout.write("%s" % tape[i])
+			else:
+				sys.stdout.write("%s," % tape[i])
+		sys.stdout.write(')')
+		sys.stdout.write("%s()" % currentState)
 	else: 
 		sys.stdout.write('(')
 		for i in range(0,pos):
@@ -114,10 +123,11 @@ def printState(tape,pos,currentState):
 		sys.stdout.write(')')
 		sys.stdout.write("%s(" % currentState)
 		for i in range(pos,len(tape)):
-			if i is len(tape)-1:
-				sys.stdout.write("%s" % tape[i])
-			else:
-				sys.stdout.write("%s," % tape[i])
+			if tape[i] is not ' ':
+				if i is len(tape)-1:
+					sys.stdout.write("%s" % tape[i])
+				else:
+					sys.stdout.write("%s," % tape[i])
 		print ")"
 
 
@@ -157,55 +167,56 @@ def processInput(tm):
 
 		#for each input character (item), interpret its effect:
 		while not done:
+			reject = 1
+
+			if currentState == tm['endStates'][0]:
+				printState(tape,pos,currentState)
+				print "ACCEPT",
+				if i is not numInputTapes-1:
+					print "\n"
+				done = 1
+				break
+			elif currentState == tm['endStates'][1]:
+				printState(tape,pos,currentState)
+				print "REJECT",
+				if i is not numInputTapes-1:
+					print "\n"
+				done = 1
+				break
+
 
 			#run through the transitinos and find the rule that governs the state we are in:
 			for key,value in tm['transitions'].iteritems():
 
-
 				#If the currentState matches the state from a transition AND the input matches
 				if currentState == value[0] and tape[pos] == value[1]:
 
-					
-										
-					printState(tape,pos,currentState)
-					if currentState == tm['endStates'][0]:
-						print "ACCEPT"
-						done = 1
-						break
-					elif currentState == tm['endStates'][1]:
-						print "REJECT"
-						done = 1
-						break
-					#if the state matched, we do this:
-					currentState = value[2]#set the next state we are going to
-					output = value[3]#symbol to be written
-					dir = value[4]#tape head direction
+					reject = 0 				#There is a valid transition, don't reject yet
+					printState(tape,pos,currentState) 	#Print the current state of the machine
+					currentState = value[2]			#set the next state we are going to
+					output = value[3]			#symbol to be written
+					dir = value[4]				#tape head direction
 		
-
 					#If you're moving right on the tape: 
 					if dir is "R":
 						tape[pos] = output
 						pos = pos + 1
 						if pos is len(tape):
 							tape.append(' ')
-							currentState = tm['endStates'][1]
 
 					#If you're moving left: 
 					elif dir is "L":
 						tape[pos] = output
 						pos = pos - 1
-					if currentState == tm['endStates'][0]:
-						printState(tape,pos,currentState)
-						print "ACCEPT"
-						done = 1
-						break
-					elif currentState == tm['endStates'][1]:
-						printState(tape,pos,currentState)
-						print "REJECT"
-						done = 1
-						break
 
+			if reject:
+				printState(tape,pos,currentState) 	#Print the current state of the machine
+				pos = pos + 1
+				if pos is len(tape):
+					tape.append(' ')
+				currentState = tm['endStates'][1]
 
+					
 
 def main(argv):
 	
