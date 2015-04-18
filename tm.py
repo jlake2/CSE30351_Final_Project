@@ -84,7 +84,7 @@ def getTM(filename):
 			elif len(f) is not 2:
 				return -1
 
-			n['acceptStates'] = f
+			n['endStates'] = f
 		else:
 			return -1
 	fd.close()
@@ -92,44 +92,111 @@ def getTM(filename):
 	return n
 
 
+
+def printState(tape,pos,currentState):
+	if pos is 0:
+		sys.stdout.write('()')
+		sys.stdout.write("%s(" % currentState)
+		for i in range(pos,len(tape)):
+			if i is len(tape)-1:
+				sys.stdout.write("%s" % tape[i])
+			else:
+				sys.stdout.write("%s," % tape[i])
+		print ")"
+	else: 
+		sys.stdout.write('(')
+		for i in range(0,pos):
+			if i is pos-1:
+				sys.stdout.write("%s" % tape[i])
+			else:
+				sys.stdout.write("%s," % tape[i])
+		sys.stdout.write(')')
+		sys.stdout.write("%s(" % currentState)
+		for i in range(pos,len(tape)):
+			if i is len(tape)-1:
+				sys.stdout.write("%s" % tape[i])
+			else:
+				sys.stdout.write("%s," % tape[i])
+		print ")"
+
 def processInput(tm):
 
  	numInputTapes = int(raw_input(""))
 
 	#Get each input tape and delimit it. 
 	for i in range(numInputTapes):
+		pos = 0
+		done = 0
 
 		#Get the input: 
 		it = raw_input("")
-		inputTape = re.split(',',it)
-		stack = []
+
+		#The tape is infinite in one direction (to the right)
+		tape = re.split(',',it)
 
 		#Used to make sure the input is valid: 
 		validInput=1;
 
-		#Set the css to whatever the start state is: 
-		cs = tm['start'][0]
-		print
-		print cs
+		#Set the current state to whatever the start state is: 
+		currentState = tm['start'][0]
+
 		#for each input character (item), interpret its effect:
-		for item in inputTape:
+		while not done:
+
 			#run through the transitinos and find the rule that governs the state we are in:
-			for tran in tm['transitions']:
-				if cs == tm['transitions'][tran][0]:
+			for key,value in tm['transitions'].iteritems():
+
+
+				#If the currentState matches the state from a transition AND the input matches
+				if currentState == value[0] and tape[pos] == value[1]:
+
+					
+										
+					printState(tape,pos,currentState)
+					if currentState == tm['endStates'][0]:
+						print "ACCEPT"
+						done = 1
+						break
+					elif currentState == tm['endStates'][1]:
+						print "REJECT"
+						done = 1
+						break
 					#if the state matched, we do this:
-					ts = tm['transitions'][tran][1]#set the current tape symbol
-					ns = tm['transitions'][tran][2]#set the next state we are going to
-					ns = tm['transitions'][tran][3]#symbol to be written
-					td = tm['transitions'][tran][4]#tape head direction
+					currentState = value[2]#set the next state we are going to
+					output = value[3]#symbol to be written
+					dir = value[4]#tape head direction
+		
+
+					#If you're moving right on the tape: 
+					if dir is "R":
+						tape[pos] = output
+						pos = pos + 1
+						if pos is len(tape):
+							tape.append(' ')
+							currentState = tm['endStates'][1]
+
+					#If you're moving left: 
+					elif dir is "L":
+						tape[pos] = output
+						pos = pos - 1
+					if currentState == tm['endStates'][0]:
+						printState(tape,pos,currentState)
+						print "ACCEPT"
+						done = 1
+						break
+					elif currentState == tm['endStates'][1]:
+						printState(tape,pos,currentState)
+						print "REJECT"
+						done = 1
+						break
+
+
 
 def main(argv):
-	#DPDA is a dictionary. Set it up:
+	
+	#The Turing Machine is described by a dictionary
 	tm = {}
 	tm = getTM(argv[1])	
-
-	for key,value in tm.iteritems():
-		print tm[key]
-
 
 
 	if(tm == -1):
