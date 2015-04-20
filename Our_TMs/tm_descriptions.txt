@@ -1,0 +1,22 @@
+Descriptions
+
+tm1.txt recognizes the language described by L = { w={0,1}* | where |w| = 2n }
+The language is an even number of zeroes and ones greater than 0.
+
+	tm1-input1.txt 
+	tm1-input2.txt 
+	tm1-input3.txt 
+
+
+tm2.txt recognizes the language described by L = { | }
+
+	tm2-input1.txt 
+	tm2-input2.txt 
+	tm2-input3.txt 
+
+
+tm3.txt recognizes the language described by L = { | }
+
+	tm3-input1.txt 
+	tm3-input2.txt 
+	tm3-input3.txt 
