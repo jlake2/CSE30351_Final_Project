@@ -1,10 +1,35 @@
-Q:q1,q2,q3,q4,q5,q6
-A:a,b,c,#
-Z:a,b,c,#, ,x
+Q:q1,q2,q3,q4,q5,q6,q7,q8
+A:a,b,c,#,$,%
+Z:a,b,c,#, ,$,%
+T:q1,%,q1,%,R
 T:q1,a,q1,a,R
 T:q1,b,q1,b,R
 T:q1,c,q1,c,R
-T:q1,x,q1,x,R
 T:q1,#,q2,#,L
+T:q2,c,q5,#,R
+T:q2,b,q4,#,R
+T:q2,a,q3,#,R
+T:q2,#,q2,#,L
+T:q2,%,q7,#,R
+T:q2, ,q7, ,R
+T:q3,#,q3,#,R
+T:q3,a,q3,a,R
+T:q3,b,q3,b,R
+T:q3,c,q3,c,R
+T:q3,$,q6,a,L
+T:q4,#,q4,#,R
+T:q4,a,q4,a,R
+T:q4,b,q4,b,R
+T:q4,c,q4,c,R
+T:q4,$,q6,b,L
+T:q5,#,q5,#,R
+T:q5,a,q5,a,R
+T:q5,b,q5,b,R
+T:q5,c,q5,c,R
+T:q5,$,q6,c,L
+T:q6,a,q6,a,L
+T:q6,b,q6,b,L
+T:q6,c,q6,c,L
+T:q6,#,q2,#,L
 S:q1
 F:q7,q8
