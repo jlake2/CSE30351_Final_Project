@@ -3,20 +3,24 @@ Descriptions
 tm1.txt recognizes the language described by L = { w={0,1}* | where |w| = 2n }
 The language is an even number of zeroes and ones greater than 0.
 
-	tm1-input1.txt 
-	tm1-input2.txt 
-	tm1-input3.txt 
 
 
-tm2.txt recognizes the language described by L = { | }
 
-	tm2-input1.txt 
-	tm2-input2.txt 
-	tm2-input3.txt 
+tm2.txt alters the input string such that the characters a, b, and c never occur out of order.
+That is to say that an a can be followed by another a or a b, but not a c,  b can be followed by
+itself or c, and c can be followed by itself or a. It does this by inserting the missing character.
+
+aa: is fine
+ab: is fine
+ac: insert b
+bb: fine
+bc: fine
+ba: insert c
+cc: fine
+cb: insert a
+ca: fine
 
 
-tm3.txt recognizes the language described by L = { | }
 
-	tm3-input1.txt 
-	tm3-input2.txt 
-	tm3-input3.txt 
+tm3.txt adds two binary numbers of length 4.  Given the string 0010+0001=00000 it will return
+0010+0001=00011.  The first two numbers are the ones to be added, equalling the third.
